@@ -524,6 +524,7 @@ sub general_config {
                "root=s"           => \$CLI{'root'},
                "ssl"              => \$CLI{'ssl'},
                "Save=s"           => \$CLI{'saveresults'},
+               "sourceip=s"       => \$CLI{'sourceip'},
                "timeout=i"        => \$CLI{'timeout'},
                "Tuning=s"         => \$CLI{'tuning'},
                "update"           => \&check_updates,
