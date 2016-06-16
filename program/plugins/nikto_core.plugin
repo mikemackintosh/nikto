@@ -615,6 +615,10 @@ sub general_config {
         push(@options,"USERAGENT=" . $CLI{'useragent'});
     }
 
+    if ($CLI{'sourceip'}) {
+        push(@options,"SOURCEIP=" . $CLI{'sourceip'});
+    }
+    
     # options allows overriding of nikto.conf entries on command line
     foreach my $option (@options) {
         my @optione=split("=", $option);
@@ -824,6 +828,9 @@ sub general_config {
     $VARIABLES{'useragent'} =~ s/\@VERSION/$VARIABLES{'version'}/g;
     my $ev = $CLI{'evasion'} || "None";
     $VARIABLES{'useragent'} =~ s/\@EVASIONS/$ev/g;
+
+    # Set up Source IP
+    $VARIABLES{'sourceip'} = $CONFIGFILE{'SOURCEIP'};
 
     # RFI URL -- push it to VARIABLES
     if (defined $CONFIGFILE{'RFIURL'}) {
@@ -2284,6 +2291,11 @@ sub setup_hash {
     if ($CLI{'evasion'} ne '') {
         $reqhash->{'whisker'}->{'anti_ids'} = $CLI{'evasion'};
     }
+    if (defined $CLI{'sourceip'}) {
+        $reqhash->{'X-Source-Ip'} = $VARIABLES{'sourceip'};
+        $reqhash->{'X-Real-Ip'} = $VARIABLES{'sourceip'};
+        $reqhash->{'X-Forwarded-For'} = $VARIABLES{'sourceip'};
+    }
     $reqhash->{'User-Agent'} = $VARIABLES{'useragent'};
     $reqhash->{'User-Agent'} =~ s/\@TESTID/$testid/;
     $reqhash->{'whisker'}->{'retry'} = 0;
@@ -2857,6 +2869,7 @@ sub usage {
        -RSAcert+          Client certificate file
        -root+             Prepend root value to all requests, format is /directory
        -Save              Save positive responses to this directory ('.' for auto-name)
+       -sourceip          Attempts to spoof source IP address
        -ssl               Force ssl mode on port
        -Tuning+           Scan tuning:
                                1     Interesting File / Seen in logs
